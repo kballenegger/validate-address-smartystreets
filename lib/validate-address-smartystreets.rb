@@ -1,5 +1,6 @@
 require 'validate'
 require 'validate/validations'
+require 'smarty_streets'
 
 module Validate
 
@@ -26,8 +27,10 @@ module Validate
     #   ]]
     #
     fails_because_key do
-      obj[field].instance_variable_get(:'validate-address-failures') ||
-        'could not be validated as an address.'
+      f = obj[field].instance_variable_get(:@ValidateAddressFailures)
+      next 'could not be validated as an address.' unless f
+      obj[field].remove_instance_variable(:@ValidateAddressFailures)
+      f
     end
     #
     def validates_and_cleans_address(obj, field, opts, validator)
@@ -36,14 +39,14 @@ module Validate
 
       # validate data types
       unless address.is_a?(Hash) || address.is_a?(String)
-        address.instance_variable_set(:'validate-address-failures',
+        address.instance_variable_set(:@ValidateAddressFailures,
                                       ['must be either an address string or hash.'])
         return false
       end
 
       # only US is valid for now
       if address.is_a?(Hash) && (address[:country] || address['country']) != 'US'
-        address.instance_variable_set(:'validate-address-failures',
+        address.instance_variable_set(:@ValidateAddressFailures,
                                       ['must be a US address.'])
         return false
       end
@@ -51,8 +54,8 @@ module Validate
       result, match, suggestions = Address.verify(address)
 
       unless result == true
-        address.instance_variable_set(:'validate-address-failures', [
-          'was not a recognizable address. suggestions:',
+        address.instance_variable_set(:@ValidateAddressFailures, [
+          'was not a deliverable address. suggestions:',
           suggestions
         ])
         return false
@@ -102,7 +105,7 @@ module Validate
       when 0
         [false, nil, nil]
       when 1
-        unless match.first.analysis['dpv_match_code'] == 'Y'
+        unless matches.first.analysis['dpv_match_code'] == 'Y'
           [false, nil, matches.map(&format_suggestion)]
         else
           [true, matches.map(&format_suggestion).first, nil]
