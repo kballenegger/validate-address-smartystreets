@@ -105,10 +105,11 @@ module Validate
       when 0
         [false, nil, nil]
       when 1
+        suggestion = matches.map(&format_suggestion)
         unless matches.first.analysis['dpv_match_code'] == 'Y'
-          [false, nil, matches.map(&format_suggestion)]
+          [false, nil, suggestion]
         else
-          [true, matches.map(&format_suggestion).first, nil]
+          [true, suggestion.first, nil]
         end
       else
         [false, nil, matches.map(&format_suggestion)]
