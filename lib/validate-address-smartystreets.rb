@@ -85,19 +85,19 @@ module Validate
                 end
       matches = SmartyStreets.standardize do |s|
         x = nil
-        s.street = x if x = address[:street] || address['street']
-        s.city = x if x = address[:city] || address['city']
-        s.state = x if x = address[:state] || address['state']
-        s.zip_code = x if x = address[:zip] || address['zip']
+        s.street   = x if x = address[:street] || address['street']
+        s.city     = x if x = address[:city]   || address['city']
+        s.state    = x if x = address[:state]  || address['state']
+        s.zip_code = x if x = address[:zip]    || address['zip']
       end
 
       format_suggestion = lambda do |s|
         {
-          street: s.street,
-          city: s.city,
-          state: s.state,
-          zip: s.zip_code,
-          country: 'US',
+          'street'  => s.street,
+          'city'    => s.city,
+          'state'   => s.state,
+          'zip'     => s.zip_code,
+          'country' => 'US',
         }
       end
 
