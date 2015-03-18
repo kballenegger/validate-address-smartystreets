@@ -88,7 +88,7 @@ module Validate
         s.street   = x if x = address[:street] || address['street']
         s.city     = x if x = address[:city]   || address['city']
         s.state    = x if x = address[:state]  || address['state']
-        s.zipcode = x if x = address[:zip]    || address['zip']
+        s.zipcode  = x if x = address[:zip]    || address['zip']
       end
 
       format_suggestion = lambda do |s|
